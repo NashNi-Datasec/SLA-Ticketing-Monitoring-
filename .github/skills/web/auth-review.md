@@ -10,6 +10,9 @@ Apply to changed frontend/auth-related code only.
 4. **Session handling** — session ID in URL, missing logout/token invalidation on sign-out
 5. **Protected routes** — client-only route guards with no corresponding server-side auth on API calls
 6. **Credential handling** — passwords or secrets logged to console, sent in query strings, or cached in browser storage
+7. **OAuth PKCE** — public OAuth clients missing `code_challenge`/`code_verifier` in changed auth flow
+8. **Refresh token rotation** — refresh tokens reused indefinitely without rotation or revocation on logout in diff
+9. **Cookie flags** — session cookies missing `Secure`, `HttpOnly`, or `SameSite` in changed auth code
 
 ## Patterns
 
@@ -17,6 +20,11 @@ Apply to changed frontend/auth-related code only.
 localStorage\.(setItem|getItem).*(token|jwt|auth)
 redirect_uri=|window\.location\.(href|replace)\s*=
 role\s*[:=].*(admin|superuser)
+code_challenge|code_verifier|SameSite|httpOnly|secure:\s*true
 ```
 
-Apply exploitability gate. Client-only guards without server bypass in diff → skip unless API call in same diff lacks auth.
+Client-only guards without server bypass in diff → skip unless API call in same diff lacks auth.
+
+Produce **candidates only** — orchestrator applies exploitability gate and OWASP scoring.
+Score severity via `shared/owasp-risk-rating.md` — never hardcode Critical.
+Report File + Line from diff only.

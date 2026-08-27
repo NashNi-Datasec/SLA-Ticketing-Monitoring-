@@ -1,6 +1,6 @@
 # Skill Routing
 
-Deterministic module selection for `/quick-security-review`. Follow this algorithm exactly — no AI discretion.
+Deterministic module selection for `/dpsa`. Follow this algorithm exactly — no AI discretion.
 
 **Silent execution:** Routing and module loading happen internally. Do not describe this process in the chat reply — output the report from `SKILL.md` only.
 
@@ -10,12 +10,23 @@ Only these paths may be loaded:
 
 | Type    | Path              | Load rule                      |
 | ------- | ----------------- | ------------------------------ |
-| Shared  | `../shared/*.md`  | **Always** — all 4 files       |
+| Shared  | see list below    | **Always** — the 7 named files |
 | Web     | `../web/*.md`     | When `web` domain selected     |
 | Mobile  | `../mobile/*.md`  | When `mobile` domain selected  |
 | Backend | `../backend/*.md` | When `backend` domain selected |
 | Infra   | `../infra/*.md`   | When `infra` domain selected   |
 
+Shared modules loaded by `/dpsa` — load these **7 files by name**, not by glob:
+
+1. `../shared/exploitability-gate.md`
+2. `../shared/low-noise-rules.md`
+3. `../shared/severity-calibration.md`
+4. `../shared/security-checks.md`
+5. `../shared/owasp-risk-rating.md`
+6. `../shared/read-only-safety.md`
+7. `../shared/dpsa-next-steps.md`
+
+`../shared/jira-integration-safety.md` belongs to `/jira-security-advisory` — do **not** load it in `/dpsa`.
 
 Never load modules outside this structure. Never invent new domains or files.
 
@@ -32,8 +43,8 @@ Never load modules outside this structure. Never invent new domains or files.
 7. If zero domain matches:
   - load shared modules only
   - perform baseline security review without domain-specific checks
-8. Always load all 4 files from `../shared/`
-9. For each selected domain, load only modules relevant to the matched patterns for that domain
+8. Always load the 7 named shared modules listed under **Allowed Modules** — no glob, and never `jira-integration-safety.md`
+9. For each selected domain, load **every** `.md` file in that domain folder (all modules in the folder — no subset selection)
 
 ---
 
@@ -51,6 +62,9 @@ Match against the full changed file path (case-insensitive).
 - `**/views/**`
 - `**/frontend/**`
 - `**/static/**` (client-side JS/CSS)
+- `**/hooks/**`
+- `**/lib/**`
+- `**/utils/**`
 
 ### mobile
 
@@ -78,6 +92,16 @@ Match against the full changed file path (case-insensitive).
 - `**/*.java`
 - `**/*.rb`
 - `**/*.php`
+- `**/*.ts` (server-side TypeScript; `.tsx` remains web-only)
+- `**/llm/**`
+- `**/agents/**`
+- `**/prompts/**`
+- `**/rag/**`
+- `**/embeddings/**`
+- `**/vector/**`
+- `**/*prompt*.*`
+- `**/*embedding*.*`
+- `**/*agent*.*`
 
 ### infra
 
@@ -92,12 +116,17 @@ Match against the full changed file path (case-insensitive).
 - `**/.env*`
 - `**/cloudformation/**`
 - `**/*.yaml` under `deploy/`, `k8s/`, `infra/`, `charts/`
+- `**/package.json`
+- `**/requirements.txt`
+- `**/go.mod`
+- `**/pom.xml`
+- `**/Cargo.toml`
 
 ---
 
 ## Routing Output
 
-Before applying checks, record which modules were loaded. Include in the review header:
+Before applying checks, record which modules were loaded. Include in the review header (with **Related tickets**, **Change summary**, and **Coverage** from `SKILL.md`):
 
 ```
 **Modules loaded:** shared, [domain1], [domain2], [domain3]
@@ -113,7 +142,11 @@ List domains in selection order (highest match count first; use tie-break order 
 | Changed files                                                                                   | Match counts                            | Modules loaded                                               |
 | ----------------------------------------------------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------ |
 | `src/routes/users.ts`                                                                           | backend: 1                              | shared, backend                                              |
+| `src/agents/support.ts`                                                                         | backend: 1 (agents/)                    | shared, backend (includes llm-security.md)                   |
+| `src/server.ts`                                                                                 | backend: 1 (.ts)                        | shared, backend                                              |
+| `src/hooks/useAuth.ts`                                                                          | web: 1, backend: 1                      | shared, backend, web (tie-break: backend before web)           |
 | `src/pages/LandingPage.tsx`                                                                     | web: 1                                  | shared, web                                                  |
+| `package.json`                                                                                  | infra: 1                                | shared, infra                                                |
 | `src/routes/api.ts`, `src/components/Form.tsx`                                                  | backend: 1, web: 1                      | shared, backend, web                                         |
 | `terraform/main.tf`, `src/routes/auth.go`, `src/views/login.vue`, `android/app/MainActivity.kt` | infra: 1, backend: 2, web: 1, mobile: 1 | shared, backend, web, infra (mobile dropped — max 3 domains) |
 | `README.md` only                                                                                | none                                    | shared only                                |

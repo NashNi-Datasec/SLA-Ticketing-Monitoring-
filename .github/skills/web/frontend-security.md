@@ -10,6 +10,9 @@ Apply to changed UI/component code only.
 4. **Clickjacking** — sensitive actions in iframe-friendly pages when frame-busting removed in diff
 5. **Sensitive data in DOM** — PII, tokens, or internal IDs rendered in HTML attributes or hidden fields accessible to scripts
 6. **Third-party scripts** — loading external scripts without SRI or integrity checks on security-sensitive pages
+7. **CSP bypass** — inline event handlers (`onclick=`) or `javascript:` URLs added when CSP restricts inline scripts
+8. **Partial sanitization** — `dangerouslySetInnerHTML` with allowlist sanitizer that misses script/event attributes
+9. **DOM clobbering** — named form elements or IDs shadowing security-sensitive globals in changed markup
 
 ## Patterns
 
@@ -17,8 +20,11 @@ Apply to changed UI/component code only.
 dangerouslySetInnerHTML|innerHTML\s*=|v-html
 eval\(|new Function\(
 postMessage\(.*\*|addEventListener\(['\"]message
+onclick=|javascript:|sanitize|DOMPurify
 ```
 
 UI/copy/feature-flag inconsistencies are **out of scope** — see `low-noise-rules.md`.
 
-Apply exploitability gate — user input must reach the sink in changed code.
+Produce **candidates only** — orchestrator applies exploitability gate and OWASP scoring.
+Score severity via `shared/owasp-risk-rating.md` — never hardcode Critical.
+Report File + Line from diff only. User input must reach the sink in changed code.

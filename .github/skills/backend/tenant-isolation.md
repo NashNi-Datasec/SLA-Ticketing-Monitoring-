@@ -10,6 +10,7 @@ Apply when changed code handles multi-tenant or org-scoped data.
 4. **Shared cache keys** — cache keys without tenant prefix allowing cross-tenant data leakage
 5. **Background jobs** — queue payloads missing tenant context, processing data across tenants
 6. **Admin impersonation** — sudo/switch-tenant features without audit logging or strict role gate in diff
+7. **Job/worker context** — async workers or cron handlers reading tenant-scoped data without tenant ID from job payload
 
 ## Patterns
 
@@ -18,6 +19,11 @@ tenant_id|org_id|organization_id|workspace_id
 WHERE.*id\s*=.*params\.(?!.*tenant)
 cache\.(get|set)\(
 switchTenant|impersonate
+queue\.|worker\.|cron\.|processJob
 ```
 
-Report only when changed code weakens or omits isolation. Apply exploitability gate with cross-tenant data access as impact.
+Report only when changed code weakens or omits isolation.
+
+Produce **candidates only** — orchestrator applies exploitability gate and OWASP scoring.
+Score severity via `shared/owasp-risk-rating.md` — never hardcode Critical.
+Report File + Line from diff only.

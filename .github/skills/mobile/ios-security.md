@@ -21,6 +21,8 @@ NSAllowsArbitraryLoads|NSExceptionDomains
 UIPasteboard\.general
 ```
 
-Apply exploitability gate. Report File + Line from diff only.
+Produce **candidates only** — orchestrator applies exploitability gate and OWASP scoring.
+Score severity via `shared/owasp-risk-rating.md` — never hardcode Critical.
+Report File + Line from diff only.
 
 React Native shared patterns may appear in `App.tsx` — also check web modules if selected.

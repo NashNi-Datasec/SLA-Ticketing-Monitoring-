@@ -10,6 +10,7 @@ Apply to changed config, env, or secrets-related files.
 4. **Secret sprawl** — same secret duplicated across multiple files in diff instead of centralized reference
 5. **Client-exposed env vars** — server secrets prefixed for frontend exposure (`NEXT_PUBLIC_`, `VITE_`, `REACT_APP_`) on sensitive keys
 6. **Rotation bypass** — hardcoded fallback secrets when env var missing in production code paths
+7. **LLM provider keys** — `OPENAI_`, `ANTHROPIC_`, `AZURE_OPENAI_`, or model API keys in env, config, or manifest diffs
 
 ## Patterns
 
@@ -18,8 +19,11 @@ Apply to changed config, env, or secrets-related files.
 \.env|AWS_SECRET|DATABASE_URL
 NEXT_PUBLIC_.*SECRET|VITE_.*KEY
 process\.env\.\w+\s*\|\|\s*['\"]
+OPENAI_|ANTHROPIC_|AZURE_OPENAI_
 ```
 
-Hardcoded production secrets in diff → **Critical** per severity calibration.
+Hardcoded secrets in diff → candidates **always pass** the exploitability gate (assigned dev as attacker); score severity via OWASP — private assigned-dev repo often **Low–Medium**, not automatic Critical.
 
-Apply exploitability gate — secret must be reachable or extractable.
+Produce **candidates only** — orchestrator applies exploitability gate and OWASP scoring.
+Score severity via `shared/owasp-risk-rating.md` — never hardcode Critical.
+Report File + Line from diff only.

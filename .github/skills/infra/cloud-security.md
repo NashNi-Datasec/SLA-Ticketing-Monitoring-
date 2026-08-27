@@ -10,6 +10,7 @@ Apply to changed cloud/deployment configuration only.
 4. **Disabled encryption** — encryption at rest or in transit explicitly disabled on data stores
 5. **Logging/monitoring disabled** — CloudTrail, audit logs, or WAF removed in changed config
 6. **Metadata service exposure** — IMDSv1 enabled or overly broad instance role permissions added
+7. **Vector DB exposure** — Pinecone, Weaviate, OpenSearch k-NN, or pgvector ports exposed publicly in TF/k8s diffs
 
 ## Patterns
 
@@ -18,6 +19,9 @@ Apply to changed cloud/deployment configuration only.
 0\.0\.0\.0/0|::/0
 public-read|publicRead|acl\s*=\s*"public"
 encrypt.*false|encrypted\s*=\s*false
+pinecone|weaviate|pgvector|opensearch.*knn
 ```
 
-Apply exploitability gate — config change must create realistic exposure path.
+Produce **candidates only** — orchestrator applies exploitability gate and OWASP scoring.
+Score severity via `shared/owasp-risk-rating.md` — never hardcode Critical.
+Report File + Line from diff only. Config change must create realistic exposure path.
