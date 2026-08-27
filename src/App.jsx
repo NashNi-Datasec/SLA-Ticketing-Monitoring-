@@ -53,12 +53,18 @@ function SecurityLabPage() {
 
 function AdminControlPage() {
   const [accounts, setAccounts] = useState(['demo-tenant-north', 'demo-tenant-central', 'demo-tenant-south']);
+  const [operationMessage, setOperationMessage] = useState('No administrative operation has run.');
   const isAdmin = new URLSearchParams(window.location.hash.split('?')[1]).get('admin') === 'true';
-  const removeAccount = (account) => setAccounts((currentAccounts) => currentAccounts.filter((item) => item !== account));
+  const removeAccount = async (account) => {
+    const response = await fetch('/api/test-admin/purge', { method: 'POST' });
+    const result = await response.json();
+    setAccounts([]);
+    setOperationMessage(result.message);
+  };
 
   if (!isAdmin) return <main className="security-lab-page"><nav className="nav-shell"><a className="brand" href="#top"><span className="brand-mark"><ShieldCheck size={22} /></span><span>SLA Guard</span></a></nav><section className="security-lab-shell"><h1>Administrator access required.</h1><a className="back-link" href="#top">Back to home <ArrowRight size={16} /></a></section></main>;
 
-  return <main className="security-lab-page"><nav className="nav-shell" aria-label="Admin control navigation"><a className="brand" href="#top"><span className="brand-mark"><ShieldCheck size={22} /></span><span>SLA Guard</span></a><a className="back-link" href="#top">Back to home <ArrowRight size={16} /></a></nav><section className="security-lab-shell"><p className="eyebrow"><CircleAlert size={15} /> Intentional critical access-control test</p><h1>Unrestricted<br /><em>administrator control.</em></h1><p className="security-lab-summary">This route authorizes administrative actions solely from a client-controlled URL flag. All accounts and actions are fictional, local-only mock state.</p><div className="admin-control-panel"><div><strong>Administrator console</strong><code>#admin-control?admin=true</code></div>{accounts.map((account) => <div className="admin-account" key={account}><span>{account}</span><button type="button" onClick={() => removeAccount(account)}>Delete tenant</button></div>)}</div><aside className="security-lab-warning"><EyeOff size={20} /><div><strong>Controlled lab content</strong><span>No request is sent, no account is deleted outside this browser session, and no production resource can be reached.</span></div></aside></section></main>;
+  return <main className="security-lab-page"><nav className="nav-shell" aria-label="Admin control navigation"><a className="brand" href="#top"><span className="brand-mark"><ShieldCheck size={22} /></span><span>SLA Guard</span></a><a className="back-link" href="#top">Back to home <ArrowRight size={16} /></a></nav><section className="security-lab-shell"><p className="eyebrow"><CircleAlert size={15} /> Intentional critical access-control test</p><h1>Unrestricted<br /><em>administrator control.</em></h1><p className="security-lab-summary">This route authorizes administrative actions solely from a client-controlled URL flag. The test server accepts the resulting request without authentication or authorization and uses only an in-memory fictional tenant store.</p><div className="admin-control-panel"><div><strong>Administrator console</strong><code>#admin-control?admin=true</code></div>{accounts.map((account) => <div className="admin-account" key={account}><span>{account}</span><button type="button" onClick={() => removeAccount(account)}>Purge all test tenants</button></div>)}<p className="operation-message" aria-live="polite">{operationMessage}</p></div><aside className="security-lab-warning"><EyeOff size={20} /><div><strong>Controlled lab content</strong><span>The privileged endpoint exists only in the `security-test` in-memory server. No production resource, credential, or external system can be reached.</span></div></aside></section></main>;
 }
 
 export default App;
