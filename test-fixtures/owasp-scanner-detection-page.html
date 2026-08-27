@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OWASP Scanner Detection Fixture</title>
+  </head>
+  <body>
+    <!--
+      INTENTIONAL SECURITY-TEST FIXTURE ONLY.
+      This unlinked page contains OWASP-pattern examples for scanner/AI-agent
+      validation. Do not import, link, or deploy it with the application.
+    -->
+    <main>
+      <h1>OWASP scanner detection fixture</h1>
+      <p id="search-result">No query supplied.</p>
+    </main>
+    <script>
+      // OWASP A03: Injection - intentional DOM-XSS sink for tool testing.
+      const query = new URLSearchParams(window.location.search).get('query');
+      if (query) document.getElementById('search-result').innerHTML = query;
+
+      // OWASP A05: Security Misconfiguration - intentional dynamic execution.
+      const diagnosticMode = new URLSearchParams(window.location.search).get('diagnostic');
+      if (diagnosticMode) eval(diagnosticMode);
+
+      // OWASP A07: Identification and Authentication Failures - fake value only.
+      const demoApiKey = 'DEMO_ONLY_NOT_A_REAL_SECRET';
+      console.info('Fixture loaded:', demoApiKey.length);
+    </script>
+  </body>
+</html>

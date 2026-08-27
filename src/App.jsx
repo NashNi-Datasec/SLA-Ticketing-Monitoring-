@@ -1,16 +1,25 @@
-import { ArrowRight, Check, ChevronRight, Clock3, Menu, ShieldCheck, Sparkles, X } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRight, Check, ChevronRight, CircleAlert, Clock3, EyeOff, Menu, ShieldCheck, Sparkles, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const outcomes = [['42%', 'fewer late reviews'], ['6.2h', 'average time saved'], ['100%', 'audit-ready history']];
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [page, setPage] = useState(() => window.location.hash === '#security-lab' ? 'security-lab' : 'home');
+
+  useEffect(() => {
+    const syncPage = () => setPage(window.location.hash === '#security-lab' ? 'security-lab' : 'home');
+    window.addEventListener('hashchange', syncPage);
+    return () => window.removeEventListener('hashchange', syncPage);
+  }, []);
+
+  if (page === 'security-lab') return <SecurityLabPage />;
 
   return <main>
     <nav className="nav-shell" aria-label="Main navigation">
       <a className="brand" href="#top" aria-label="SLA Guard home"><span className="brand-mark"><ShieldCheck size={22} strokeWidth={2.5} /></span><span>SLA Guard</span></a>
       <div className={`nav-links ${isMenuOpen ? 'nav-links-open' : ''}`}>
-        <a href="#product" onClick={() => setIsMenuOpen(false)}>Product</a><a href="#outcomes" onClick={() => setIsMenuOpen(false)}>Outcomes</a><a href="#workflow" onClick={() => setIsMenuOpen(false)}>Workflow</a>
+        <a href="#product" onClick={() => setIsMenuOpen(false)}>Product</a><a href="#outcomes" onClick={() => setIsMenuOpen(false)}>Outcomes</a><a href="#workflow" onClick={() => setIsMenuOpen(false)}>Workflow</a><a href="#security-lab" onClick={() => setIsMenuOpen(false)}>Security lab</a>
         <a className="nav-cta" href="#get-started" onClick={() => setIsMenuOpen(false)}>Book a walkthrough <ArrowRight size={16} /></a>
       </div>
       <button className="menu-button" type="button" aria-label="Toggle menu" aria-expanded={isMenuOpen} onClick={() => setIsMenuOpen(!isMenuOpen)}>{isMenuOpen ? <X /> : <Menu />}</button>
@@ -29,5 +38,15 @@ function App() {
 function Metric({ label, value, change, risk }) { return <div className="metric"><small>{label}</small><strong className={risk ? 'metric-risk' : ''}>{value}</strong><span className={risk ? 'metric-change risk-text' : 'metric-change'}>{change}</span></div>; }
 function Timeline({ name, owner, days, tone, initials }) { return <div className="timeline-item"><span className={`status-dot ${tone}`} /><div className="timeline-name"><strong>{name}</strong><small><b>{initials}</b>{owner}</small></div><span className={`deadline ${tone}`}>{days}</span></div>; }
 function DashboardPreview() { return <div className="product-stage" aria-label="SLA Guard application preview"><div className="stage-glow" /><div className="dashboard-preview"><div className="preview-topbar"><div className="preview-logo"><ShieldCheck size={18} /> SLA Guard</div><div className="preview-user"><span>AR</span><i /></div></div><div className="preview-body"><aside className="preview-sidebar"><span className="sidebar-active" /><span /><span /><span /><span /></aside><div className="preview-content"><div className="preview-heading"><div><small>OVERVIEW</small><strong>Assessment health</strong></div><button>+ New assessment</button></div><div className="metric-row"><Metric label="Open assessments" value="24" change="+4 this week" /><Metric label="At risk" value="03" change="Needs attention" risk /><Metric label="On track" value="21" change="87.5% of all work" /></div><div className="activity-panel"><div className="activity-head"><div><strong>Deadline horizon</strong><small>Next 14 days</small></div><span>View all</span></div><Timeline name="Payments API" owner="Maya Chen" days="Today" tone="urgent" initials="MC" /><Timeline name="Data classification" owner="Jordan Wright" days="2 days" tone="watch" initials="JW" /><Timeline name="Merchant onboarding" owner="Alex Rivera" days="8 days" tone="good" initials="AR" /></div></div></div></div><div className="notification-card"><span className="notice-icon"><Clock3 size={16} /></span><div><strong>Payments API is due today</strong><small>Owner notified 8 minutes ago</small></div></div></div>; }
+
+function SecurityLabPage() {
+  const [searchTerm, setSearchTerm] = useState('<strong>Search preview</strong>');
+  const params = new URLSearchParams(window.location.search);
+  const isAdmin = params.get('role') === 'admin';
+  const demoApiKey = 'demo_public_key_not_a_real_secret';
+  const unsafeSql = `SELECT * FROM assessments WHERE owner = '${searchTerm}'`;
+
+  return <main className="security-lab-page"><nav className="nav-shell" aria-label="Security lab navigation"><a className="brand" href="#top"><span className="brand-mark"><ShieldCheck size={22} strokeWidth={2.5} /></span><span>SLA Guard</span></a><a className="back-link" href="#top">Back to home <ArrowRight size={16} /></a></nav><section className="security-lab-shell"><p className="eyebrow"><CircleAlert size={15} /> Intentional vulnerability lab</p><h1>Security detection<br /><em>validation route.</em></h1><p className="security-lab-summary">This page is intentionally unsafe for AI security-agent validation. It uses fictional data only and must not be promoted outside this test PR.</p><div className="security-lab-grid"><article className="security-lab-card"><h2>Injection examples</h2><label htmlFor="lab-query">Unsafe lookup input</label><input id="lab-query" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} /><code>{unsafeSql}</code><div className="xss-preview" dangerouslySetInnerHTML={{ __html: searchTerm }} /></article><article className="security-lab-card"><h2>Access control example</h2><p>Role state is read directly from the URL rather than verified by a server.</p><code>?role=admin</code>{isAdmin && <div className="admin-panel">Fictional restricted review: regional assessment summary</div>}</article><article className="security-lab-card"><h2>Exposure examples</h2><p>Fake credential-like value embedded in client code:</p><code>{demoApiKey}</code><p>Fictional support record rendered in the client:</p><pre>{JSON.stringify({ email: 'demo.user@example.test', accountId: 'demo-acct-1001', caseNote: 'Fictional training record' }, null, 2)}</pre></article></div><aside className="security-lab-warning"><EyeOff size={20} /><div><strong>Controlled lab content</strong><span>No external service, production credential, real user data, or database is used by this page.</span></div></aside></section></main>;
+}
 
 export default App;
