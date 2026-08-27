@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Intentional OWASP A03 Test Fixture</title>
+  </head>
+  <body>
+    <!--
+      INTENTIONAL TEST FIXTURE ONLY: OWASP A03: Injection / DOM XSS.
+      This page is deliberately unsafe for scanner and review-pipeline testing.
+      Do not import, link, or deploy it with the application.
+    -->
+    <main>
+      <h1>OWASP A03 DOM-XSS fixture</h1>
+      <p id="test-output"></p>
+    </main>
+    <script>
+      const message = new URLSearchParams(window.location.search).get('message') || 'No test message supplied.';
+      document.getElementById('test-output').innerHTML = message;
+    </script>
+  </body>
+</html>
