@@ -1,0 +1,58 @@
+:root {
+  --ink: #102a43;
+  --soft-ink: #5d7086;
+  --paper: #f5f9fd;
+  --line: #cbd8e6;
+  --coral: #1677c8;
+  --lime: #83d5ff;
+  --mint: #d7eeff;
+}
+
+.eyebrow {
+  color: #22618f;
+}
+
+.stage-glow {
+  border-color: #b8d8ee;
+  background: #e2f1fc;
+}
+
+.preview-logo svg,
+.metric-risk,
+.risk-text,
+.activity-head > span,
+.outcome strong,
+.steps span {
+  color: #1677c8;
+}
+
+.preview-sidebar .sidebar-active,
+.feature-icon.coral,
+.timeline-dot.red,
+.status-dot.urgent {
+  border-color: #1677c8;
+  background: #1677c8;
+}
+
+.deadline.urgent {
+  color: #12609f;
+  background: #d9efff;
+}
+
+.notice-icon {
+  color: #1677c8;
+  background: #d8efff;
+}
+
+.feature-wide {
+  background: #d7eeff;
+}
+
+.dark-feature {
+  background: #102a43;
+  border-color: #102a43;
+}
+
+.dark-feature a {
+  color: #83d5ff;
+}
