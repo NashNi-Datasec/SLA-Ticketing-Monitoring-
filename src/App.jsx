@@ -1,16 +1,25 @@
-import { ArrowRight, Check, ChevronRight, Clock3, Menu, ShieldCheck, Sparkles, X } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRight, Check, ChevronRight, CircleAlert, Clock3, EyeOff, Menu, ShieldCheck, Sparkles, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const outcomes = [['42%', 'fewer late reviews'], ['6.2h', 'average time saved'], ['100%', 'audit-ready history']];
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [page, setPage] = useState(() => window.location.hash === '#disclosure-demo' ? 'disclosure-demo' : 'home');
+
+  useEffect(() => {
+    const syncPage = () => setPage(window.location.hash === '#disclosure-demo' ? 'disclosure-demo' : 'home');
+    window.addEventListener('hashchange', syncPage);
+    return () => window.removeEventListener('hashchange', syncPage);
+  }, []);
+
+  if (page === 'disclosure-demo') return <InformationDisclosureDemo />;
 
   return <main>
     <nav className="nav-shell" aria-label="Main navigation">
       <a className="brand" href="#top" aria-label="SLA Guard home"><span className="brand-mark"><ShieldCheck size={22} strokeWidth={2.5} /></span><span>SLA Guard</span></a>
       <div className={`nav-links ${isMenuOpen ? 'nav-links-open' : ''}`}>
-        <a href="#product" onClick={() => setIsMenuOpen(false)}>Product</a><a href="#outcomes" onClick={() => setIsMenuOpen(false)}>Outcomes</a><a href="#workflow" onClick={() => setIsMenuOpen(false)}>Workflow</a>
+        <a href="#product" onClick={() => setIsMenuOpen(false)}>Product</a><a href="#outcomes" onClick={() => setIsMenuOpen(false)}>Outcomes</a><a href="#workflow" onClick={() => setIsMenuOpen(false)}>Workflow</a><a href="#disclosure-demo" onClick={() => setIsMenuOpen(false)}>Disclosure demo</a>
         <a className="nav-cta" href="#get-started" onClick={() => setIsMenuOpen(false)}>Book a walkthrough <ArrowRight size={16} /></a>
       </div>
       <button className="menu-button" type="button" aria-label="Toggle menu" aria-expanded={isMenuOpen} onClick={() => setIsMenuOpen(!isMenuOpen)}>{isMenuOpen ? <X /> : <Menu />}</button>
@@ -29,5 +38,7 @@ function App() {
 function Metric({ label, value, change, risk }) { return <div className="metric"><small>{label}</small><strong className={risk ? 'metric-risk' : ''}>{value}</strong><span className={risk ? 'metric-change risk-text' : 'metric-change'}>{change}</span></div>; }
 function Timeline({ name, owner, days, tone, initials }) { return <div className="timeline-item"><span className={`status-dot ${tone}`} /><div className="timeline-name"><strong>{name}</strong><small><b>{initials}</b>{owner}</small></div><span className={`deadline ${tone}`}>{days}</span></div>; }
 function DashboardPreview() { return <div className="product-stage" aria-label="SLA Guard application preview"><div className="stage-glow" /><div className="dashboard-preview"><div className="preview-topbar"><div className="preview-logo"><ShieldCheck size={18} /> SLA Guard</div><div className="preview-user"><span>AR</span><i /></div></div><div className="preview-body"><aside className="preview-sidebar"><span className="sidebar-active" /><span /><span /><span /><span /></aside><div className="preview-content"><div className="preview-heading"><div><small>OVERVIEW</small><strong>Assessment health</strong></div><button>+ New assessment</button></div><div className="metric-row"><Metric label="Open assessments" value="24" change="+4 this week" /><Metric label="At risk" value="03" change="Needs attention" risk /><Metric label="On track" value="21" change="87.5% of all work" /></div><div className="activity-panel"><div className="activity-head"><div><strong>Deadline horizon</strong><small>Next 14 days</small></div><span>View all</span></div><Timeline name="Payments API" owner="Maya Chen" days="Today" tone="urgent" initials="MC" /><Timeline name="Data classification" owner="Jordan Wright" days="2 days" tone="watch" initials="JW" /><Timeline name="Merchant onboarding" owner="Alex Rivera" days="8 days" tone="good" initials="AR" /></div></div></div></div><div className="notification-card"><span className="notice-icon"><Clock3 size={16} /></span><div><strong>Payments API is due today</strong><small>Owner notified 8 minutes ago</small></div></div></div>; }
+
+function InformationDisclosureDemo() { return <main className="disclosure-page"><nav className="nav-shell" aria-label="Disclosure demonstration navigation"><a className="brand" href="#top"><span className="brand-mark"><ShieldCheck size={22} strokeWidth={2.5} /></span><span>SLA Guard</span></a><a className="back-link" href="#top">Back to home <ArrowRight size={16} /></a></nav><section className="disclosure-shell"><div className="disclosure-heading"><p className="eyebrow"><CircleAlert size={15} /> Security demonstration</p><h1>Information disclosure,<br /><em>reviewed safely.</em></h1><p>This training view illustrates how verbose error details can expose unnecessary implementation context. Every value below is fictional or redacted.</p></div><div className="disclosure-grid"><article className="exposure-card"><div className="exposure-card-header"><span><CircleAlert size={18} /> Example response review</span><b>Training scenario</b></div><div className="response-line"><span>status</span><strong>500</strong></div><div className="response-line"><span>request ID</span><code>demo-req-••••••••</code></div><div className="response-line"><span>service</span><code>assessment-api [redacted]</code></div><div className="response-line"><span>message</span><code>Internal error. Contact support with request ID.</code></div></article><aside className="review-note"><EyeOff size={21} /><h2>What stays protected</h2><p>Stack traces, environment values, internal hostnames, tokens, and personal data are intentionally omitted from this page.</p><div><Check size={16} /> Fictional data only</div><div><Check size={16} /> No live error endpoint</div><div><Check size={16} /> No diagnostic data exposed</div></aside></div></section></main>; }
 
 export default App;
