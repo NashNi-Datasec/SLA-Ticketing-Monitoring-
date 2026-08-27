@@ -20,4 +20,6 @@ setState.*admin|isAdmin\s*=\s*true
 
 Report only when changed code enables abuse. UI label mismatches without data-flow impact → skip.
 
-Apply exploitability gate — require attacker path and impact.
+Produce **candidates only** — orchestrator applies exploitability gate and OWASP scoring.
+Score severity via `shared/owasp-risk-rating.md` — never hardcode Critical.
+Report File + Line from diff only.

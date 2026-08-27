@@ -21,3 +21,6 @@ image:.*:latest
 ```
 
 Report File + Line from diff. Theoretical misconfigurations outside changed lines → skip.
+
+Produce **candidates only** — orchestrator applies exploitability gate and OWASP scoring.
+Score severity via `shared/owasp-risk-rating.md` — never hardcode Critical.

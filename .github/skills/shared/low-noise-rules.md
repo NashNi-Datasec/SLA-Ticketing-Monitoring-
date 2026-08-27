@@ -2,7 +2,7 @@
 
 ## Reply Format
 
-When running as part of `/quick-security-review`, contribute rules only — do **not** add narration about applying these rules. The orchestrator outputs the report template with no preamble.
+When running as part of `/dpsa` or `/full-assessment-security-review`, contribute rules only — do **not** add narration about applying these rules. The orchestrator outputs its report template with no preamble (`## Digital Product Security Assessment (DPSA)` or `## Full Assessment Security Review`).
 
 ## Out of Scope — Do NOT Report
 
@@ -14,8 +14,10 @@ Always ignore these, even if present in the diff:
 - Styling, layout, accessibility, performance (unless clear DoS risk in changed code)
 - Missing tests or coverage gaps
 - Refactoring, naming, DRY, maintainability issues
-- Docs or `.github/` files unless part of git diff
+- Docs or `.github/` files unless the diff itself introduces an exploitable workflow/script issue
 - Compliance-only or best-practice-only observations without exploitability
+- “Might be vulnerable”, missing hardening, or defense-in-depth suggestions without a visible exploit in the diff
+- Workflow/CI/docs-only nits that are not a concrete injection or secret leak in changed lines
 
 ## Do NOT Report as Medium or High
 

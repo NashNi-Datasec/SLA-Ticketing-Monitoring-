@@ -1,11 +1,22 @@
 ---
 description: Brief security self-check when code changes may impact confidentiality, integrity, or availability
-applyTo: "**/auth/**,**/login/**,**/routes/**,**/controllers/**,**/middleware/**,**/api/**,**/handlers/**,**/models/**,**/payments/**,**/admin/**,**/config/**,**/.env*"
+applyTo: "**/auth/**,**/login/**,**/oauth/**,**/sso/**,**/identity/**,**/sessions/**,**/session/**,**/routes/**,**/controllers/**,**/middleware/**,**/api/**,**/handlers/**,**/graphql/**,**/resolvers/**,**/models/**,**/repositories/**,**/repository/**,**/queries/**,**/query/**,**/dao/**,**/services/**,**/service/**,**/payments/**,**/payment/**,**/billing/**,**/checkout/**,**/uploads/**,**/upload/**,**/storage/**,**/files/**,**/tenant/**,**/tenants/**,**/admin/**,**/policies/**,**/policy/**,**/permissions/**,**/rbac/**,**/acl/**,**/webhooks/**,**/webhook/**,**/jobs/**,**/workers/**,**/rate-limit*/**,**/ratelimit*/**,**/throttle*/**,**/config/**,**/secrets/**,**/security/**,**/.env*,**/llm/**,**/agents/**,**/prompts/**,**/rag/**,**/embeddings/**,**/vector/**"
 ---
 
 Provide a brief CIA-gated security self-check when editing sensitive code paths.
 
-Apply only when changes may impact Confidentiality, Integrity, or Availability.
+This is **coaching while coding** — not a formal `/dpsa` review. Keep outputs short.
+
+**How loading works:** Copilot attaches this file only when the edited path matches `applyTo` above. The **Apply when** / **Skip** sections are a second filter after it loads. Paths outside `applyTo` still get `secure-coding-baseline.instructions.md` (always on). Formal DPSA is the staging/UAT PR Action; `/dpsa` is optional preview.
+
+This file owns **Scenario 2** (security-related change) when loaded. **Scenario 1** (non-security-only PASS) lives in `secure-coding-baseline.instructions.md`. Scenario definitions: `.github/skills/shared/dpsa-next-steps.md`
+
+## Do NOT
+
+- Output OWASP vectors, severity ratings, or **Digital Product Security Assessment (DPSA)** report format
+- Perform a full repository scan or generate long reports
+- Invent issues not visible in the current change
+- Duplicate the `/dpsa` report — the official review is the staging/UAT PR Action; `/dpsa` is optional preview
 
 ## Skip when changes are only
 
@@ -13,128 +24,53 @@ Apply only when changes may impact Confidentiality, Integrity, or Availability.
 - Formatting, whitespace, import ordering, or non-functional cleanup
 - Renames with no behavioral impact
 - Pure styling or CSS-only changes with no data-flow impact
+- Static UI copy / display text with no data-flow or security impact
 - Test-only updates with no production behavior changes
 
-If changes are limited to those cases, do not run this check.
+If changes are limited to those cases, do not run this CIA check. **Scenario 1** from `secure-coding-baseline.instructions.md` is automatic (Related tickets + Change summary + PASS) — do not block or replace that block.
 
 ## Apply when changes involve
 
-- Authentication or authorization
-- Sessions, JWT, OAuth, MFA, or permissions
-- API routes, controllers, middleware, handlers, or webhooks
-- SQL queries, ORM filtering, or dynamic query construction
-- File uploads, exports, parsing, or deserialization
-- Payments, checkout, credits, billing, or financial workflows
-- Tenant isolation, admin features, or role-sensitive logic
-- Secrets, configuration, environment variables, or security settings
-- Rate limiting, throttling, or abuse protections
+Authentication, authorization, API routes, SQL/queries, file uploads, payments, tenant isolation, secrets/config, rate limiting, or LLM/agent/RAG logic — when there is **real logic change** in the diff.
 
-## Self-check requirements
+## Self-check (changed code only)
 
-Review only:
+Glance at the current change for:
 
-- the current diff
-- changed files
-- directly related nearby logic
+- Missing authentication or authorization on new/changed endpoints
+- Injection or unsafe query construction with user input
+- Mass assignment or accepting full request body on sensitive updates
+- Hardcoded secrets or credentials
+- Broken tenant isolation (ID without ownership/tenant filter)
+- Client-trusted price, role, or status used server-side
+- Prompt injection or untrusted content in LLM/RAG context construction
+- Tool or function execution without authorization checks
+- Secrets or PII embedded in prompts sent to external model APIs
 
-Do not perform a full repository audit.
+Only flag what you can see in the **current change**. If uncertain, skip — do not speculate.
 
-Check for:
+## Response rules (Scenario 2)
 
-- Missing authentication or authorization
-- Injection risks
-- Mass assignment risks
-- Sensitive data exposure
-- Broken tenant isolation
-- Business-logic abuse opportunities
-- Unsafe configuration changes
-- Missing validation on security-sensitive inputs
+**Scenario 2 — security-related change** (paths/topics above), no formal findings yet. End with this block (keep coaching short above it if needed):
 
-## Finding Quality Rules
+```markdown
+**Related tickets:** [PROJ-123 | none detected]
+**Change summary:** [1–2 sentences — what changed in this turn]
 
-- Report only findings supported by visible code or the current diff
-- Include the affected file and best-known line or code location when observable in the current context
-- Clearly distinguish confirmed risks from low-confidence observations
-- Assign a confidence level:
-  - High — directly observable exploitable issue
-  - Medium — likely issue with partial supporting evidence
-  - Low — suspicious pattern requiring manual verification
-- Prefer reporting:
-  - exploitable vulnerabilities
-  - authorization flaws
-  - tenant isolation risks
-  - injection risks
-  - sensitive data exposure
-  - business-logic abuse opportunities
-- Avoid reporting:
-  - hypothetical-only issues
-  - framework-protected behavior already handled safely
-  - missing controls that are not observable in the current code
-  - speculative infrastructure assumptions
-  - duplicate findings
-  - compliance-only or best-practice-only observations without realistic security impact
-  - UI, UX, wording, styling, accessibility, or maintainability observations unrelated to security
-- Combine duplicate findings that share the same root cause
-- Include only fields relevant to the observed issue
-- Prefer minimal secure remediation over large architectural rewrites
-- When possible, briefly explain:
-  - how the issue could realistically be abused
-  - what input, request, or flow triggers the issue
-  - what condition makes the issue exploitable
-- Keep abuse explanations concise:
-  - 1–2 sentences maximum
-  - no exploit walkthroughs
-  - no attack scripts
-  - no step-by-step penetration instructions
-- Keep reproduction guidance realistic and evidence-based
-- Do not invent attack scenarios unsupported by the visible implementation
-- If confidence is Low:
-  - explicitly recommend manual verification
+**AI Security Review Result: Further Action Required** — Security-related changes involving [auth | API | payments | tenant | LLM | admin | infra | …]. **Official:** open a same-repo PR into staging/UAT (DPSA comment is automatic). **Optional:** `/dpsa` in VS Code to preview — not required before the PR.
+```
 
-## Preferred Finding Format
+Ticket keys: from user message, branch name, or recent commits when available — else `none detected`. Never invent keys.
 
-- File:
-- Line:
-- Severity:
-- Confidence:
-- Concern:
-- Security impact:
-- Minimal fix:
+**Clear issue in current change:** 2–4 lines — concern, minimal fix, then the Scenario 2 block. Do not require `/dpsa` before they open a PR.
 
-## Response rules
-
-- If no CIA-relevant concern is found:
-  - say nothing, or:
-  - `No CIA-relevant concerns in this change.`
-- If an issue is found:
-  - keep feedback brief and actionable
-  - include only relevant fields
-  - keep remediation concise (approximately 3–5 lines)
-- Prioritize exploitable issues over informational advice
-- Avoid speculative or low-confidence findings
-- Do not generate long reports or large rewrites
+- Keep feedback inline with coding help — not a standalone audit
 - Do not create report files
-- Do not scan unrelated areas of the repository
-
+- Do not emit the full `/dpsa` report template (no Coverage / Modules loaded / Findings counts here)
 ## Escalation
 
-For substantial changes involving:
+For substantial auth, API, payment, tenant-isolation, LLM/agent, or infrastructure changes:
 
-- authentication
-- authorization
-- APIs
-- payments
-- tenant isolation
-- administrative actions
-- infrastructure or security configuration
+**Official:** open a same-repo PR into staging/UAT.
 
-suggest:
-
-`/quick-security-review`
-
-## Scope
-
-- Follow only rules relevant to the current context
-- Do not apply unrelated checks
-- Keep reviews concise and security-focused
-
+**Optional:** `/dpsa`
