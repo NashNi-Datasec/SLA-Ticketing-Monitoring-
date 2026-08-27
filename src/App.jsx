@@ -1,22 +1,42 @@
-import { ArrowRight, Check, ChevronRight, Clock3, Menu, ShieldCheck, Sparkles, X } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRight, Check, ChevronRight, CircleAlert, Clock3, Menu, ShieldCheck, Sparkles, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const outcomes = [['42%', 'fewer late reviews'], ['6.2h', 'average time saved'], ['100%', 'audit-ready history']];
+const assessments = [
+  { name: 'Payments API', owner: 'Maya Chen', days: 'Today', tone: 'urgent', initials: 'MC', detail: 'Owner notified 8 minutes ago' },
+  { name: 'Data classification', owner: 'Jordan Wright', days: '2 days', tone: 'watch', initials: 'JW', detail: 'Evidence review is in progress' },
+  { name: 'Merchant onboarding', owner: 'Alex Rivera', days: '8 days', tone: 'good', initials: 'AR', detail: 'All checkpoints are on schedule' },
+];
+const sampleIssues = [
+  { id: 'SG-104', title: 'Dependency license record needs review', severity: 'Low', area: 'Vendor management', owner: 'Priya Shah', due: 'Sep 12' },
+  { id: 'SG-128', title: 'Stale data-retention note in onboarding flow', severity: 'Low', area: 'Policy evidence', owner: 'Maya Chen', due: 'Sep 16' },
+  { id: 'SG-091', title: 'MFA recovery procedure missing approver', severity: 'Medium', area: 'Identity process', owner: 'Jordan Wright', due: 'Sep 03' },
+  { id: 'SG-117', title: 'Third-party review is past its evidence date', severity: 'Medium', area: 'Vendor management', owner: 'Alex Rivera', due: 'Sep 06' },
+];
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [page, setPage] = useState(() => window.location.hash === '#issues' ? 'issues' : 'home');
+
+  useEffect(() => {
+    const syncPage = () => setPage(window.location.hash === '#issues' ? 'issues' : 'home');
+    window.addEventListener('hashchange', syncPage);
+    return () => window.removeEventListener('hashchange', syncPage);
+  }, []);
+
+  if (page === 'issues') return <IssueTestPage />;
 
   return <main>
     <nav className="nav-shell" aria-label="Main navigation">
       <a className="brand" href="#top" aria-label="SLA Guard home"><span className="brand-mark"><ShieldCheck size={22} strokeWidth={2.5} /></span><span>SLA Guard</span></a>
       <div className={`nav-links ${isMenuOpen ? 'nav-links-open' : ''}`}>
-        <a href="#product" onClick={() => setIsMenuOpen(false)}>Product</a><a href="#outcomes" onClick={() => setIsMenuOpen(false)}>Outcomes</a><a href="#workflow" onClick={() => setIsMenuOpen(false)}>Workflow</a>
+        <a href="#product" onClick={() => setIsMenuOpen(false)}>Product</a><a href="#outcomes" onClick={() => setIsMenuOpen(false)}>Outcomes</a><a href="#workflow" onClick={() => setIsMenuOpen(false)}>Workflow</a><a href="#issues" onClick={() => setIsMenuOpen(false)}>Test issues</a>
         <a className="nav-cta" href="#get-started" onClick={() => setIsMenuOpen(false)}>Book a walkthrough <ArrowRight size={16} /></a>
       </div>
       <button className="menu-button" type="button" aria-label="Toggle menu" aria-expanded={isMenuOpen} onClick={() => setIsMenuOpen(!isMenuOpen)}>{isMenuOpen ? <X /> : <Menu />}</button>
     </nav>
     <section className="hero" id="top">
-      <div className="hero-copy"><p className="eyebrow"><Sparkles size={15} /> Security reviews, on schedule</p><h1>Every security commitment.<br /><em>Right on time.</em></h1><p className="hero-summary">SLA Guard brings every assessment, owner, and deadline into one calm command center, so teams can see risk early and move before it becomes urgent.</p><div className="hero-actions" id="get-started"><a className="button button-primary" href="#workflow">See how it works <ArrowRight size={18} /></a><a className="text-link" href="#product">Explore the console <ChevronRight size={17} /></a></div><div className="hero-proof"><span><Check size={16} /> No more spreadsheet chasing</span><span><Check size={16} /> Clear ownership at every step</span></div></div>
+      <div className="hero-copy"><p className="eyebrow"><Sparkles size={15} /> Security reviews, on schedule</p><h1>Every security commitment.<br /><em>Right on time.</em></h1><p className="hero-summary">SLA Guard brings every assessment, owner, and deadline into one calm command center, so teams can see risk early and move before it becomes urgent.</p><div className="hero-actions" id="get-started"><a className="button button-primary" href="#workflow">See how it works <ArrowRight size={18} /></a><a className="text-link" href="#product">Explore the console <ChevronRight size={17} /></a></div><div className="hero-proof"><span><Check size={16} /> No more spreadsheet chasing</span><span><Check size={16} /> Clear ownership at every step</span></div><div className="hero-pulse" aria-label="Current SLA Guard operational status"><span><i /> Live operational view</span><strong>21 of 24 assessments are on track</strong></div></div>
       <DashboardPreview />
     </section>
     <section className="outcomes-strip" id="outcomes"><p>Built for teams who take delivery seriously</p><div className="outcome-list">{outcomes.map(([value, label]) => <div className="outcome" key={label}><strong>{value}</strong><span>{label}</span></div>)}</div></section>
@@ -27,7 +47,14 @@ function App() {
 }
 
 function Metric({ label, value, change, risk }) { return <div className="metric"><small>{label}</small><strong className={risk ? 'metric-risk' : ''}>{value}</strong><span className={risk ? 'metric-change risk-text' : 'metric-change'}>{change}</span></div>; }
-function Timeline({ name, owner, days, tone, initials }) { return <div className="timeline-item"><span className={`status-dot ${tone}`} /><div className="timeline-name"><strong>{name}</strong><small><b>{initials}</b>{owner}</small></div><span className={`deadline ${tone}`}>{days}</span></div>; }
-function DashboardPreview() { return <div className="product-stage" aria-label="SLA Guard application preview"><div className="stage-glow" /><div className="dashboard-preview"><div className="preview-topbar"><div className="preview-logo"><ShieldCheck size={18} /> SLA Guard</div><div className="preview-user"><span>AR</span><i /></div></div><div className="preview-body"><aside className="preview-sidebar"><span className="sidebar-active" /><span /><span /><span /><span /></aside><div className="preview-content"><div className="preview-heading"><div><small>OVERVIEW</small><strong>Assessment health</strong></div><button>+ New assessment</button></div><div className="metric-row"><Metric label="Open assessments" value="24" change="+4 this week" /><Metric label="At risk" value="03" change="Needs attention" risk /><Metric label="On track" value="21" change="87.5% of all work" /></div><div className="activity-panel"><div className="activity-head"><div><strong>Deadline horizon</strong><small>Next 14 days</small></div><span>View all</span></div><Timeline name="Payments API" owner="Maya Chen" days="Today" tone="urgent" initials="MC" /><Timeline name="Data classification" owner="Jordan Wright" days="2 days" tone="watch" initials="JW" /><Timeline name="Merchant onboarding" owner="Alex Rivera" days="8 days" tone="good" initials="AR" /></div></div></div></div><div className="notification-card"><span className="notice-icon"><Clock3 size={16} /></span><div><strong>Payments API is due today</strong><small>Owner notified 8 minutes ago</small></div></div></div>; }
+function Timeline({ assessment, isSelected, onSelect }) { return <button className={`timeline-item ${isSelected ? 'timeline-item-selected' : ''}`} type="button" onClick={() => onSelect(assessment)} aria-pressed={isSelected}><span className={`status-dot ${assessment.tone}`} /><div className="timeline-name"><strong>{assessment.name}</strong><small><b>{assessment.initials}</b>{assessment.owner}</small></div><span className={`deadline ${assessment.tone}`}>{assessment.days}</span></button>; }
+function DashboardPreview() { const [selectedAssessment, setSelectedAssessment] = useState(assessments[0]); return <div className="product-stage" aria-label="SLA Guard application preview"><div className="stage-glow" /><div className="dashboard-preview"><div className="preview-topbar"><div className="preview-logo"><ShieldCheck size={18} /> SLA Guard</div><div className="preview-user"><span>AR</span><i /></div></div><div className="preview-body"><aside className="preview-sidebar"><span className="sidebar-active" /><span /><span /><span /><span /></aside><div className="preview-content"><div className="preview-heading"><div><small>OVERVIEW</small><strong>Assessment health</strong></div><button type="button">+ New assessment</button></div><div className="metric-row"><Metric label="Open assessments" value="24" change="+4 this week" /><Metric label="At risk" value="03" change="Needs attention" risk /><Metric label="On track" value="21" change="87.5% of all work" /></div><div className="activity-panel"><div className="activity-head"><div><strong>Deadline horizon</strong><small>Next 14 days</small></div><span>View all</span></div>{assessments.map((assessment) => <Timeline assessment={assessment} isSelected={selectedAssessment.name === assessment.name} key={assessment.name} onSelect={setSelectedAssessment} />)}</div></div></div></div><div className="notification-card" aria-live="polite"><span className="notice-icon"><Clock3 size={16} /></span><div><strong>{selectedAssessment.name} is due {selectedAssessment.days.toLowerCase()}</strong><small>{selectedAssessment.detail}</small></div></div></div>; }
+
+function IssueTestPage() {
+  const [severity, setSeverity] = useState('All');
+  const visibleIssues = severity === 'All' ? sampleIssues : sampleIssues.filter((issue) => issue.severity === severity);
+
+  return <main className="issue-page"><nav className="nav-shell" aria-label="Issue testing navigation"><a className="brand" href="#top"><span className="brand-mark"><ShieldCheck size={22} strokeWidth={2.5} /></span><span>SLA Guard</span></a><a className="back-link" href="#top">Back to home <ArrowRight size={16} /></a></nav><section className="issue-shell"><div className="issue-page-heading"><div><p className="eyebrow"><CircleAlert size={15} /> Sample workspace</p><h1>Issue testing<br /><em>without the noise.</em></h1><p>Use these fictional, low- and medium-severity findings to test triage views, filters, and review workflows.</p></div><div className="sample-notice"><CircleAlert size={18} /><span><strong>Test data only</strong>These records are fictional and safe to use in demos.</span></div></div><div className="issue-toolbar"><div className="issue-count"><strong>{visibleIssues.length}</strong><span>issues shown</span></div><div className="severity-filter" aria-label="Filter sample issues by severity">{['All', 'Low', 'Medium'].map((level) => <button className={severity === level ? 'filter-active' : ''} type="button" onClick={() => setSeverity(level)} key={level}>{level}</button>)}</div></div><div className="issue-table-wrap"><table className="issue-table"><caption className="sr-only">Sample low- and medium-severity issues</caption><thead><tr><th>Issue</th><th>Severity</th><th>Area</th><th>Owner</th><th>Review due</th></tr></thead><tbody>{visibleIssues.map((issue) => <tr key={issue.id}><td><span className="issue-id">{issue.id}</span><strong>{issue.title}</strong></td><td><span className={`severity-tag severity-${issue.severity.toLowerCase()}`}>{issue.severity}</span></td><td>{issue.area}</td><td>{issue.owner}</td><td>{issue.due}</td></tr>)}</tbody></table></div></section></main>;
+}
 
 export default App;
