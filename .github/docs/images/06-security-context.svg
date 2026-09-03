@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="280" viewBox="0 0 800 280" role="img" aria-label="Screenshot placeholder">
+  <rect width="800" height="280" fill="#f4f4f5" stroke="#a1a1aa" stroke-width="2" stroke-dasharray="10 6" rx="10"/>
+  <text x="400" y="110" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#3f3f46">Screenshot placeholder</text>
+  <text x="400" y="145" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" fill="#52525b">App repo .github/security-context.md  filled-in app_size and platform</text>
+  <text x="400" y="175" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" fill="#71717a">Replace with PNG ’ docs/images/06-security-context.png</text>
+</svg>
