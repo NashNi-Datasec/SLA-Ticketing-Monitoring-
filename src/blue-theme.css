@@ -56,3 +56,28 @@
 .dark-feature a {
   color: #83d5ff;
 }
+
+.sample-notice,
+.severity-filter,
+.issue-table-wrap,
+.dashboard-preview,
+.notification-card,
+.metric,
+.activity-panel,
+.feature:not(.dark-feature) {
+  background-color: #fbfdff;
+}
+
+.issue-table td {
+  border-bottom-color: #dce7f2;
+}
+
+.severity-low {
+  color: #2f6f91;
+  background: #e2f1fc;
+}
+
+.severity-medium {
+  color: #7b5f00;
+  background: #fff3ce;
+}
