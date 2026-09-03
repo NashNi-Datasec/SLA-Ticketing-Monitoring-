@@ -7,19 +7,7 @@ on:
     types: [opened, synchronize, reopened, labeled, ready_for_review]
     # Keep only this app's staging/UAT base names. Comment out or delete the rest.
     branches:
-      - staging
-      - stage
-      - uat
-      - preprod
-      - pre-prod
-      - "*-staging"
-      - "*-stage"
-      - "*-uat"
-      - "*-preprod"
-      # - main
-      # - develop
-      # - iacc-preprod
-
+      - main
 permissions:
   contents: write
   pull-requests: write
